@@ -1,4 +1,4 @@
-(function(){
+;(function(){
 
 	var Game = function(canvasId) {
 		var canvas = document.getElementById(canvasId);
@@ -33,27 +33,50 @@
 			for (var i = 0; i < this.bodies.length; i++) {
 				drawRect(screen, this.bodies[i]);
 			}
-		}
+		},
+
+		addBody: function(body) {
+			this.bodies.push(body);
+		}, 
 	}
 
 	var Player = function(game, gameSize) {
 		this.game = game;
-		this.size = {width:16, height:16};
+		this.size = {width:16, height:16}; 
 		this.position = {x: gameSize.x/2-this.size.width/2, y: gameSize.y/2-this.size.height/2};
-		this.keyboarder = new keyboarder();
+		this.keyboarder = new Keyboarder();
 	}
 
 	Player.prototype = {
 		update: function() {
 			if(this.keyboarder.isDown(this.keyboarder.KEYS.left)) {
 				this.position.x -= 2;
-			} else if (this.keyboarder.isDown(this.keyboarder.KEYS.right)) {
+			} if (this.keyboarder.isDown(this.keyboarder.KEYS.right)) {
 				this.position.x += 2;
-			}
+			} if (this.keyboarder.isDown(this.keyboarder.KEYS.space)) {
+				var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},
+					{x:0, y:-6});
+				this.game.addBody(bullet);
+			} 
 		}
 	}
 
-	var keyboarder = function() {
+
+
+	var Bullet = function(position, velocity) {
+		this.size = {width:3, height:3}; 
+		this.position = position;
+		this.velocity = velocity;
+	}
+
+	Bullet.prototype = {
+		update: function() {
+			this.position.x += this.velocity.x;
+			this.position.y += this.velocity.y;
+		}
+	}
+
+	var Keyboarder = function() {
 		var keyState = {};
 
 		window.onkeydown = function(e) {
