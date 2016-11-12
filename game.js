@@ -23,6 +23,16 @@
 
 	Game.prototype = {
 		update: function(gameSize) {
+			var bodies = this.bodies;
+
+			var notCollidingWithAnything = function(b1) {
+				return bodies.filter(function(b2) {
+					return colliding(b1, b2);
+				}).length == 0;
+			}
+
+			this.bodies = this.bodies.filter(notCollidingWithAnything);
+
 			for (var i = 0; i < this.bodies.length; i++) {
 				if (this.bodies[i].position.y < 0) {
 					this.bodies.splice(i, 1);
@@ -81,15 +91,15 @@
 				this.position.x += 2;
 			} if (this.keyboarder.isDown(this.keyboarder.KEYS.space)) {
 				if (this.bullets < 5) {
-					var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},
+					var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y-4},
 						{x:0, y:-6});
 					this.game.addBody(bullet);
 					this.bullets++;
 				}
 			}
 			this.timer++; 
-			if (this.timer%12 == 0) {
-				this.bullets =0;
+			if (this.timer%24 == 0) {
+				this.bullets = 0;
 			}
 		}
 	}
@@ -136,6 +146,14 @@
 			invaders.push(new Invader(game, {x:x, y:y}));
 		}
 		return invaders;
+	}
+
+	var colliding = function(b1, b2) {
+		return !(b1 == b2 || 
+				b1.position.x + b1.size.width / 2 < b2.position.x - b2.size.width / 2 || 
+				b1.position.y + b1.size.height / 2 < b2.position.y - b2.size.height / 2 || 
+				b1.position.x - b1.size.width / 2 > b2.position.x + b2.size.width / 2 || 
+				b1.position.y - b1.size.height / 2 > b2.position.y + b2.size.height / 2 );
 	}
 
 	var drawRect = function(screen, body) {
